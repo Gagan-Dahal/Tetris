@@ -16,7 +16,7 @@ board::board(int screenWidth, int screenHeight){
 void board::checkCell(int row, int column){
     if(grid[row][column] == 1 || grid[row][column] == 2){
         int drawX = column * cellWidth;
-        int drawY = row * cellHeight;
+        int  drawY = row * cellHeight;
         Color cellColor;
         if(grid[row][column] == 1 ) cellColor = RED;
         else cellColor = BLUE;
