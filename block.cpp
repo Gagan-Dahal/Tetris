@@ -95,7 +95,7 @@ void block::rotate(std::array<std::array<int, 5>, 5>& curPiece){
 
 void block::selectPiece(){
     // to select a number from 0 to 6 randomly
-    int selectedPieceNo = 5;
+    int selectedPieceNo = 0;
     piece = TETROMINO[selectedPieceNo];
     // std::cout<<piece<<std::endl;
     x = defaultX;
@@ -110,6 +110,9 @@ void block::fallDown(){
     y+=1;
 }
     
+void block::move(int dx){
+    x+=dx;
+}
 
 int block::getX() const{
     return x;

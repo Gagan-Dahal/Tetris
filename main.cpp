@@ -4,7 +4,7 @@
 #include <iostream>
 #include "raylib.h"
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 900
 
 int main(){
@@ -14,7 +14,6 @@ int main(){
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "TETRIS take 1");
     int count = 0;
-    int status;
     piece.selectPiece();
     // std::cout<<grid.canPlace(piece)<<std::endl;
 
@@ -23,8 +22,9 @@ int main(){
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        status = grid.canPlace(piece);
-        if(count >= 25){
+        grid.checkLine();
+        grid.trackKeys(piece);
+        if(count >= 100){
             if (grid.canFall(piece)) piece.fallDown();
             
             else{

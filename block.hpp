@@ -15,4 +15,5 @@ class block{
         int getX() const;
         int getY() const;
         const std::array<std::array<int, 5>, 5>& shape() const;  
+        void move(int dx);
 };

@@ -4,8 +4,8 @@
 
 
 
-inline constexpr int NUM_ROWS = 50;
-inline constexpr int NUM_COLS = 40;
+inline constexpr int NUM_ROWS = 40;
+inline constexpr int NUM_COLS = 20;
 
 class board{
     private:
@@ -15,6 +15,7 @@ class board{
         int curBlockX;
         int curBlockY;
         int visRows;
+        int visCols;
     public:
         board(int, int);
 
@@ -24,4 +25,7 @@ class board{
         bool canFall(const block& tetro);
         void drawPiece(const block& tetro);
         void placePerm(const block& tetro);
+        void trackKeys(block& tetro);
+        void checkLine(void);
+        void deleteLine(int rowNum);
 };

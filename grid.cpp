@@ -39,7 +39,7 @@ void board::drawGrid(){
 // 0 for game over, 1 for valid position, 2 for invalid position but still in game, 3 to fix
 int board::canPlace(const block& tetro, int pieceX, int pieceY){
     int k;
-    int l = 0;
+    int l;
 
     if(pieceX == -100 and pieceY == -100){
         pieceX = tetro.getX();
@@ -56,14 +56,34 @@ int board::canPlace(const block& tetro, int pieceX, int pieceY){
         visRows = 5;
         k = 0;
     }
+    if(pieceX<0){
+        l = -pieceX;
+        visCols = pieceX + 5;
+        pieceX = 0;
+    }
+    else{
+        visCols = 5;
+        l = 0;
+    }
 
-    if(pieceX<0 || pieceX >= NUM_COLS) return 2;
+    if(pieceX<-4 || pieceX >= NUM_COLS) return 2;
+    if(pieceX<0){
+        for(int i = 0; i<5;i++){
+            for(int j = 0; j<=-pieceX; j++){
+                if(piece[i][j] == 1) return 2;
+            }
+        }
+    }
     
     for (int i = pieceY; i<pieceY+visRows; i++){
-        for (int j = pieceX; j<pieceX+5; j++){
-            if (piece[k][l] == 1 && grid[i][j] == 2 &&  visRows<5) return 0;
-            else if ((piece[k][l] == 1 && i>NUM_ROWS) || (piece[k][l] == 1 && j > NUM_COLS)) return 2;
-            else if ((piece[k][l] == 1 && grid[i][j] == 2) || (piece[k][l] == 1 && i==NUM_ROWS)) return 2;
+        for (int j = pieceX; j<pieceX+visCols; j++){
+            if (piece[k][l] == 1){
+                if(j>=NUM_COLS || i>=NUM_ROWS) return 2;
+                if(grid[i][j] == 2){
+                    if (visRows<5) return 0;
+                    else return 2;
+                }
+            }
             l++;
         }
         l = 0;
@@ -108,3 +128,39 @@ void board::placePerm(const block& tetro){
         }
 }
 
+
+void board::trackKeys(block& tetro){
+    int pressed_key = GetKeyPressed();
+    if (pressed_key == KEY_LEFT) {
+        int pieceX = tetro.getX();
+        int pieceY = tetro.getY();
+
+        pieceX--;
+        if(canPlace(tetro, pieceX, pieceY) == 1) {
+            tetro.move(-1);
+        }
+    }
+    else if(pressed_key == KEY_RIGHT){
+        int pieceX = tetro.getX();
+        int pieceY = tetro.getY();
+        pieceX++;
+        if(canPlace(tetro, pieceX, pieceY) == 1) tetro.move(1);
+    }
+}
+
+void board::deleteLine(int row_num){
+    for (int i = 0; i < NUM_COLS; i++){
+        grid[row_num][i] = 0;
+    }
+}
+
+void board::checkLine(){
+    for (int i = NUM_ROWS - 1; i>=0; i--){
+        for (int j = NUM_COLS - 1; j>=0; j--){
+            if (grid[i][j] != 2){
+                break;
+            }
+            if (j == 0) deleteLine(i);
+        }
+    }
+}
