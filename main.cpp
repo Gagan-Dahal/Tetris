@@ -24,7 +24,7 @@ int main(){
         ClearBackground(RAYWHITE);
         grid.checkLine();
         grid.trackKeys(piece);
-        if(count >= 100){
+        if(count >= 200){
             if (grid.canFall(piece)) piece.fallDown();
             
             else{

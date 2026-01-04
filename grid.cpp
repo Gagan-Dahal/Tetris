@@ -40,6 +40,7 @@ void board::drawGrid(){
 int board::canPlace(const block& tetro, int pieceX, int pieceY){
     int k;
     int l;
+    int coloff;
 
     if(pieceX == -100 and pieceY == -100){
         pieceX = tetro.getX();
@@ -56,37 +57,35 @@ int board::canPlace(const block& tetro, int pieceX, int pieceY){
         visRows = 5;
         k = 0;
     }
-    if(pieceX<0){
-        l = -pieceX;
-        visCols = pieceX + 5;
-        pieceX = 0;
-    }
-    else{
-        visCols = 5;
-        l = 0;
-    }
 
     if(pieceX<-4 || pieceX >= NUM_COLS) return 2;
+    
     if(pieceX<0){
         for(int i = 0; i<5;i++){
-            for(int j = 0; j<=-pieceX; j++){
+            for(int j = 0; j<-pieceX; j++){
                 if(piece[i][j] == 1) return 2;
             }
         }
+        coloff = -pieceX;
+        visCols = pieceX + 5;
+        pieceX = 0;
     }
+
+    else{
+        visCols = 5;
+        coloff = 0;
+    }
+
     
     for (int i = pieceY; i<pieceY+visRows; i++){
+        l = coloff;
         for (int j = pieceX; j<pieceX+visCols; j++){
             if (piece[k][l] == 1){
                 if(i<0 || j<0 || j>=NUM_COLS || i>=NUM_ROWS) return 2;
-                if(grid[i][j] == 2){
-                    // if (visRows<5) return 0;
-                    return 2;
-                }
+                if(grid[i][j] == 2) return 2;
             }
             l++;
         }
-        l = 0;
         k++;
     }
     return 1;
