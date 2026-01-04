@@ -78,10 +78,10 @@ int board::canPlace(const block& tetro, int pieceX, int pieceY){
     for (int i = pieceY; i<pieceY+visRows; i++){
         for (int j = pieceX; j<pieceX+visCols; j++){
             if (piece[k][l] == 1){
-                if(j>=NUM_COLS || i>=NUM_ROWS) return 2;
+                if(i<0 || j<0 || j>=NUM_COLS || i>=NUM_ROWS) return 2;
                 if(grid[i][j] == 2){
-                    if (visRows<5) return 0;
-                    else return 2;
+                    // if (visRows<5) return 0;
+                    return 2;
                 }
             }
             l++;
@@ -102,12 +102,19 @@ bool board::canFall(const block& tetro){
 void board::drawPiece(const block& tetro){
     int pieceX = tetro.getX();
     int pieceY = tetro.getY();
+    int boardX, boardY;
     const auto& piece = tetro.shape();
         for (int i = 0; i<5; i++){
             for (int j = 0; j<5; j++){
                 if(piece[i][j] == 1){ 
-                    int drawX = (pieceX + j) * cellWidth;
-                    int drawY = (pieceY + i) * cellHeight;
+
+                    boardX = pieceX+j;
+                    boardY = pieceY+i;
+
+                    if(boardX<0 || boardX>=NUM_COLS || boardY<0 || boardY>=NUM_ROWS) continue;
+
+                    int drawX = boardX * cellWidth;
+                    int drawY = boardY * cellHeight;
                     DrawRectangle(drawX, drawY, cellWidth, cellHeight, RED);
                     DrawRectangleLines(drawX, drawY, cellWidth, cellHeight, BLACK);
                 }
@@ -118,11 +125,17 @@ void board::drawPiece(const block& tetro){
 void board::placePerm(const block& tetro){
     int pieceX = tetro.getX();
     int pieceY = tetro.getY();
+    int boardX, boardY;
     std::array<std::array<int, 5>, 5> piece = tetro.shape();
         for (int i = 0; i<5; i++){
             for (int j = 0; j<5; j++){
                 if(piece[i][j] == 1){
-                    grid[pieceY+i][pieceX+j] = 2;
+                    boardX = pieceX +j;
+                    boardY = pieceY + i;
+
+                    if(boardX<0 || boardX>=NUM_COLS || boardY<0 || boardY>=NUM_ROWS) continue;
+
+                    grid[boardY][boardX] = 2;
                 }
             }
         }
