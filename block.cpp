@@ -75,10 +75,11 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 
-block::block(const int defaultX): gen(std::random_device{}()),dist(0, 6) {
+block::block(const int defaultX): gen(std::random_device{}()),dist(0, 6){
     this->defaultX = defaultX;
     x = defaultX;
     y = -4;
+    nextPieceNum = std::nullopt;
 }
 
 void block::checkRotate(){
@@ -101,7 +102,14 @@ void block::swapRotatedBlock(){
 
 void block::selectPiece(){
     // to select a number from 0 to 6 randomly
-    int selectedPieceNo = dist(gen);
+    int selectedPieceNo;
+    if(!nextPieceNum.has_value()){
+        selectedPieceNo = dist(gen);
+    }
+    else{
+        selectedPieceNo  = *nextPieceNum;
+    }
+    nextPieceNum = dist(gen);
     // std::cout<<"Random number generated successfully as "<<selectedPieceNo<<std::endl;
     piece = TETROMINO[selectedPieceNo];
     // std::cout<<piece<<std::endl;
@@ -132,5 +140,10 @@ int block::getY() const{
     return y;
 }
 
+const std::array<std::array<int, 5>, 5>& block:: nextPiece()const{
+    return TETROMINO[*nextPieceNum];
+}
 
-
+void block::reset(){
+    nextPieceNum = std::nullopt;
+}

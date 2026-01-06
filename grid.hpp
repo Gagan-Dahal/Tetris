@@ -4,12 +4,15 @@
 
 
 
-inline constexpr int NUM_ROWS = 40;
+inline constexpr int NUM_ROWS = 25;
 inline constexpr int NUM_COLS = 20;
 inline constexpr int LINE_SUM = NUM_COLS*2;
 
 class board{
     private:
+        int screenWidthText;
+        int screenWidthGrid;
+        int screenHeight;
         int cellHeight;
         int cellWidth;
         std::array<std::array<int, NUM_COLS>, NUM_ROWS> grid = {};
@@ -17,6 +20,7 @@ class board{
         int curBlockY;
         int visRows;
         int visCols;
+        int score;
     public:
         board(int, int);
 
@@ -30,4 +34,7 @@ class board{
         void checkLine(void);
         void deleteLine(const int& rowNum);
         void collapseRowWise(const int& rowNUm);
+        bool isGameOver(block& tetro);
+        void drawScore(block& tetro, int gameStatus = 0);
+        void resetBoard();
 };

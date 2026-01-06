@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "grid.hpp"
 #include <iostream>
+#include <string>
 
 
 board::board(int screenWidth, int screenHeight){
@@ -8,14 +9,20 @@ board::board(int screenWidth, int screenHeight){
     curBlockX = 0;
     curBlockY = 0;
 
-    cellWidth = screenWidth / NUM_COLS;
+    screenWidthText = int(0.4*screenWidth);
+    screenWidthGrid = screenWidth - screenWidthText;
+    this->screenHeight = screenHeight;
+
+    cellWidth = screenWidthGrid / NUM_COLS;
     cellHeight = screenHeight / NUM_ROWS;
+
+    score = 0;
 }
         
 
 void board::checkCell(int row, int column){
     if(grid[row][column] == 1 || grid[row][column] == 2){
-        int drawX = column * cellWidth;
+        int drawX = column * cellWidth + 2;
         int  drawY = row * cellHeight;
         Color cellColor;
         cellColor = BLUE;
@@ -23,7 +30,7 @@ void board::checkCell(int row, int column){
     }
 }
 void board::drawGrid(){
-    int currentX = 0;
+    int currentX = 2;
     int currentY = 0;
     for (int i = 0; i<NUM_ROWS; i++){
         for (int j = 0; j<NUM_COLS; j++){
@@ -31,11 +38,11 @@ void board::drawGrid(){
             checkCell(i, j);
             currentX += cellWidth;
         }
-        currentX = 0;
+        currentX = 2;
         currentY += cellHeight;
     }
 }
-// 0 for game over, 1 for valid position, 2 for invalid position but still in game, 3 to fix
+// 1 for valid position, 2 for invalid position
 int board::canPlace(block& tetro, int pieceX, int pieceY, bool toTest){
     int k;
     int l;
@@ -117,7 +124,7 @@ void board::drawPiece(const block& tetro){
 
                     if(boardX<0 || boardX>=NUM_COLS || boardY<0 || boardY>=NUM_ROWS) continue;
 
-                    int drawX = boardX * cellWidth;
+                    int drawX = boardX * cellWidth + 2;
                     int drawY = boardY * cellHeight;
                     DrawRectangle(drawX, drawY, cellWidth, cellHeight, RED);
                     DrawRectangleLines(drawX, drawY, cellWidth, cellHeight, WHITE);
@@ -140,6 +147,7 @@ void board::placePerm(const block& tetro){
                     if(boardX<0 || boardX>=NUM_COLS || boardY<0 || boardY>=NUM_ROWS) continue;
 
                     grid[boardY][boardX] = 2;
+                    score+=1;
                 }
             }
         }
@@ -190,9 +198,81 @@ void board::checkLine(){
             grid[writerow] = grid[readrow];
             writerow--;
         }
+        else{
+            score+=LINE_SUM;
+        }
     }
 
     for (int i = writerow; i>=0; i--){
         grid[i] = {};
     }
+}
+
+
+bool board::isGameOver(block& tetro){
+    int pieceY = tetro.getY();
+
+    if(pieceY<0){
+        if(canPlace(tetro) == 1){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    else{
+        return false;
+    }
+}
+
+void board::drawScore(block& tetro, int gameStatus){
+    // gamestatus is 0 for continue, 1 for pause and 2 for game over
+    int scoreX, scoreY;
+    Color textColor = WHITE;
+    std::string scoreString;
+    scoreString = "Score: ";
+    scoreString += std::to_string(score);
+
+    scoreX = screenWidthGrid + 60;
+    scoreY = int(0.5*screenHeight);
+
+    int textFont = 40;
+
+    DrawText(scoreString.c_str(), scoreX, scoreY, textFont, textColor);
+    
+
+    auto nextPiece = tetro.nextPiece();
+    int nextPieceX, nextPieceY;
+    nextPieceX = screenWidthGrid + screenWidthText - int(screenWidthText/2) - (2*cellWidth) - 10;
+    nextPieceY = 100;
+    int curNextPieceX = nextPieceX; 
+
+    for (int i = 0; i<5; i++){
+        for (int x: nextPiece[i]){
+            if(x){
+                DrawRectangle(curNextPieceX, nextPieceY, cellWidth, cellHeight, GREEN);
+                DrawRectangleLines(curNextPieceX, nextPieceY, cellWidth, cellHeight, WHITE);
+            }
+            curNextPieceX+=cellWidth;
+        }
+        curNextPieceX = nextPieceX;
+        nextPieceY += cellHeight;
+    }
+
+    if(gameStatus == 2){
+        DrawText("GAME OVER !!", scoreX - 40, scoreY + 50, textFont, RED);
+        DrawText("Press ENTER for Rematch", scoreX - 50, scoreY + 120, 22, GREEN);
+        DrawText("Press Q to Quit", scoreX - 50, scoreY + 150, 22, ORANGE);
+    }
+    else if(gameStatus == 1){
+        DrawText("GAME PAUSED !!", scoreX - 40, scoreY + 50, textFont, BLUE);
+        DrawText("Press P to Resume", scoreX - 50, scoreY + 120, 22, BLUE);
+        DrawText("Press ENTER to Restart", scoreX - 50, scoreY + 150, 22, GREEN);
+        DrawText("Press Q to Quit", scoreX - 50, scoreY + 180, 22, ORANGE);
+    }
+}
+
+void board::resetBoard(){
+    grid = {0};
+    score = 0;
 }

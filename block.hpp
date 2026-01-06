@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <random>
+#include <optional>
 
 
 class block{
@@ -11,6 +12,7 @@ class block{
         int defaultX;
         std::mt19937 gen;
         std::uniform_int_distribution<int> dist;
+        std::optional<int> nextPieceNum;
     public:
         block(const int);
         void checkRotate();
@@ -22,6 +24,7 @@ class block{
         int getY() const;
         const std::array<std::array<int, 5>, 5>& shape() const; 
         const std::array<std::array<int, 5>, 5>& testShape() const; 
-
+        const std::array<std::array<int, 5>, 5>& nextPiece() const; 
         void move(int dx);
+        void reset();
 };
