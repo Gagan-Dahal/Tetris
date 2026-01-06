@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "raylib.h"
+#include <chrono>
 
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 900
@@ -21,7 +22,7 @@ int main(){
     while (!WindowShouldClose()){
 
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
         grid.checkLine();
         grid.trackKeys(piece);
         if(count >= 200){

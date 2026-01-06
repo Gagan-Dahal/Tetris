@@ -18,8 +18,7 @@ void board::checkCell(int row, int column){
         int drawX = column * cellWidth;
         int  drawY = row * cellHeight;
         Color cellColor;
-        if(grid[row][column] == 1 ) cellColor = RED;
-        else cellColor = BLUE;
+        cellColor = BLUE;
         DrawRectangle(drawX, drawY, cellWidth, cellHeight, cellColor);
     }
 }
@@ -28,7 +27,7 @@ void board::drawGrid(){
     int currentY = 0;
     for (int i = 0; i<NUM_ROWS; i++){
         for (int j = 0; j<NUM_COLS; j++){
-            DrawRectangleLines(currentX, currentY, cellWidth, cellHeight, BLACK);
+            DrawRectangleLines(currentX, currentY, cellWidth, cellHeight, WHITE);
             checkCell(i, j);
             currentX += cellWidth;
         }
@@ -37,17 +36,23 @@ void board::drawGrid(){
     }
 }
 // 0 for game over, 1 for valid position, 2 for invalid position but still in game, 3 to fix
-int board::canPlace(const block& tetro, int pieceX, int pieceY){
+int board::canPlace(block& tetro, int pieceX, int pieceY, bool toTest){
     int k;
     int l;
     int coloff;
+    std::array<std::array<int, 5>, 5> piece;
 
     if(pieceX == -100 and pieceY == -100){
         pieceX = tetro.getX();
         pieceY = tetro.getY();
     }
+    if(!toTest){
+        piece = tetro.shape();
+    }
+    else{
+        piece = tetro.testShape();
+    }
 
-    std::array<std::array<int, 5>, 5> piece = tetro.shape();
     if(pieceY<0) {
         k = -pieceY;
         visRows = pieceY + 5;
@@ -91,7 +96,7 @@ int board::canPlace(const block& tetro, int pieceX, int pieceY){
     return 1;
 }
 
-bool board::canFall(const block& tetro){
+bool board::canFall(block& tetro){
     int pieceX = tetro.getX();
     int pieceY = tetro.getY() + 1;
     if (canPlace(tetro, pieceX, pieceY) == 1) return true;
@@ -115,7 +120,7 @@ void board::drawPiece(const block& tetro){
                     int drawX = boardX * cellWidth;
                     int drawY = boardY * cellHeight;
                     DrawRectangle(drawX, drawY, cellWidth, cellHeight, RED);
-                    DrawRectangleLines(drawX, drawY, cellWidth, cellHeight, BLACK);
+                    DrawRectangleLines(drawX, drawY, cellWidth, cellHeight, WHITE);
                 }
             }
         }
@@ -158,21 +163,36 @@ void board::trackKeys(block& tetro){
         pieceX++;
         if(canPlace(tetro, pieceX, pieceY) == 1) tetro.move(1);
     }
-}
-
-void board::deleteLine(int row_num){
-    for (int i = 0; i < NUM_COLS; i++){
-        grid[row_num][i] = 0;
+    else if (pressed_key == KEY_DOWN || pressed_key == KEY_UP){
+        std::array<std::array<int, 5>, 5> testBlock;
+        tetro.checkRotate();
+        testBlock = tetro.testShape();
+        if(canPlace(tetro, -100, -100, true) == 1){
+            tetro.swapRotatedBlock();
+        }
     }
 }
 
+
 void board::checkLine(){
-    for (int i = NUM_ROWS - 1; i>=0; i--){
-        for (int j = NUM_COLS - 1; j>=0; j--){
-            if (grid[i][j] != 2){
+    int writerow = NUM_ROWS - 1;
+    bool full;
+
+    for (int readrow = NUM_ROWS - 1; readrow>=0; readrow--){
+        full = true;
+        for (int a: grid[readrow]){
+            if (a == 0){
+                full = false;
                 break;
             }
-            if (j == 0) deleteLine(i);
         }
+        if (!full){
+            grid[writerow] = grid[readrow];
+            writerow--;
+        }
+    }
+
+    for (int i = writerow; i>=0; i--){
+        grid[i] = {};
     }
 }

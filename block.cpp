@@ -75,27 +75,34 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 
-block::block(const int defaultX) {
+block::block(const int defaultX): gen(std::random_device{}()),dist(0, 6) {
     this->defaultX = defaultX;
     x = defaultX;
     y = -4;
 }
 
-void block::rotate(std::array<std::array<int, 5>, 5>& curPiece){
+void block::checkRotate(){
+    testPiece = piece;
     for (int i = 0; i<5; i++){
         for (int j = i+1; j<5; j++){
-            std::swap(curPiece[i][j], curPiece[j][i]);
+            std::swap(testPiece[i][j], testPiece[j][i]);
         }
     }
 
-    for(std::array<int, 5>& row : curPiece){
+    for(std::array<int, 5>& row : testPiece){
         std::reverse(row.begin(), row.end());
     }
+    
+}
+
+void block::swapRotatedBlock(){
+    piece = testPiece;
 }
 
 void block::selectPiece(){
     // to select a number from 0 to 6 randomly
-    int selectedPieceNo = 0;
+    int selectedPieceNo = dist(gen);
+    // std::cout<<"Random number generated successfully as "<<selectedPieceNo<<std::endl;
     piece = TETROMINO[selectedPieceNo];
     // std::cout<<piece<<std::endl;
     x = defaultX;
@@ -104,6 +111,9 @@ void block::selectPiece(){
 
 const std::array<std::array<int, 5>, 5>& block::shape() const{
     return piece;
+}
+const std::array<std::array<int, 5>, 5>& block::testShape() const{
+    return testPiece;
 }
 
 void block::fallDown(){
